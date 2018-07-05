@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".AddNote"
+    android:orientation="vertical">
+
+    <EditText
+        android:id="@+id/editTextTopic"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="Enter Topic"
+        android:inputType="textPersonName"
+        android:textSize="30dp"
+        android:padding="15dp"
+        android:layout_marginBottom="20dp"
+        />
+
+    <EditText
+        android:id="@+id/editTextNote"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:padding="15dp"
+        android:layout_weight="1"
+        android:hint="Enter Description"
+        android:textSize="20dp"
+        android:layout_marginBottom="5dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/timerText"
+        android:textSize="20sp"
+        android:padding="15dp"
+        android:layout_marginBottom="5dp"
+        />
+
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="TextView"
+        android:textSize="20sp"
+        android:padding="15dp"
+        android:layout_marginBottom="5dp"/>
+
+    <ImageButton
+        android:id="@+id/imageButton"
+        android:layout_width="93dp"
+        android:layout_height="wrap_content"
+        android:onClick="timer"
+        app:srcCompat="@android:drawable/ic_lock_idle_alarm" />
+    <ImageButton
+        android:id="@+id/imageButton2"
+        android:layout_width="93dp"
+        android:layout_height="wrap_content"
+        android:onClick="timeSet"
+        android:src="@drawable/calendar_icon"
+        tools:ignore="OnClick" />
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Save"
+        android:padding="5dp"
+        android:layout_marginTop="15dp"
+        android:background="#121"
+        android:textColor="#ffff"
+        android:textSize="30dp"
+        android:onClick="button"
+        android:layout_marginBottom="20dp"/>
+
+</LinearLayout>
