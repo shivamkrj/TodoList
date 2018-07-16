@@ -222,6 +222,8 @@ public class MainActivity extends AppCompatActivity {
 
             long curTime = System.currentTimeMillis();
             long differenceInTime = time-curTime;
+            items.add(toDo);
+            adapter.notifyDataSetChanged();
             if(differenceInTime<=0){
                 itemsOverDue.add(toDo);
                 adapterOverDue.notifyDataSetChanged();
@@ -384,7 +386,6 @@ public class MainActivity extends AppCompatActivity {
                 checkBox.setChecked(false);
             }
         });
-
         AlertDialog dialog =builder.create();
         dialog.show();
     }
