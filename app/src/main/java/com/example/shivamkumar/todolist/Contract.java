@@ -8,6 +8,5 @@ public class Contract {
         public static String COLUMN_NOTE = "note";
         public static String COLUMN_ID = "id";
         public static String COLUMN_TIME = "time";
-        public static String COLUMN_TIMESET = "timeset";
     }
 }

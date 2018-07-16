@@ -4,4 +4,6 @@
     <string name="title_activity_description2">Description2</string>
     <string name="title_activity_d3">d3</string>
     <string name="title_activity_edit_description">EditDescription</string>
+    <string name="save_changes">Save Changes</string>
+    <string name="name">Name</string>
 </resources>

@@ -10,12 +10,15 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.Calendar;
+
 public class Description2 extends Activity {
 
     TextView t;
     TextView n;
     TextView timer;
-    String time;
+    TextView timerSet;
+    Long time;
     String topic;
     String note;
     long id ;
@@ -44,15 +47,26 @@ public class Description2 extends Activity {
         while (cursor.moveToNext()){
             topic = cursor.getString(cursor.getColumnIndex(Contract.ToDo.COLUMN_TOPIC));
             note = cursor.getString(cursor.getColumnIndex(Contract.ToDo.COLUMN_NOTE));
-            time = cursor.getString(cursor.getColumnIndex(Contract.ToDo.COLUMN_TIME));
+            time = cursor.getLong(cursor.getColumnIndex(Contract.ToDo.COLUMN_TIME));
         }
         t=findViewById(R.id.textView);
         n=findViewById(R.id.textView2);
         timer=findViewById(R.id.textView3);
+        timerSet=findViewById(R.id.textViewTims);
 
         t.setText(topic);
         n.setText(note);
-        timer.setText(time);
+
+        int h,m,d,mon,y;
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(time);
+        h=calendar.get(Calendar.HOUR_OF_DAY);
+        m=calendar.get(Calendar.MINUTE);
+        d=calendar.get(Calendar.DAY_OF_MONTH);
+        mon=calendar.get(Calendar.MONTH);
+        y=calendar.get(Calendar.YEAR);
+        timerSet.setText(h+":"+m);
+        timer.setText(d + "/"  + mon + "/" + y);
 
     }
 

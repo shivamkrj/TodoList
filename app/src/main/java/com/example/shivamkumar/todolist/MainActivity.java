@@ -1,78 +1,120 @@
 package com.example.shivamkumar.todolist;
 
+import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.LinearSnapHelper;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SnapHelper;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.AdapterView;
+import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
-public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener,AdapterView.OnItemLongClickListener{
+public class MainActivity extends AppCompatActivity {
 
-    ListView listView;
+    RecyclerView listView;
     ArrayList<ToDo> items;
-    ToDoAdapter adapter;
-    SharedPreferences sharedPreferences;
+    ToDoRecyclerAdapter adapter;
     int current=0;
-    int pos;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar =findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
                 newNote();
             }
         });
         items = new ArrayList<ToDo>();
-        listView=findViewById(R.id.list_item);
-        adapter= new ToDoAdapter(this,items);
+        listView=findViewById(R.id.recyclerView);
+        adapter= new ToDoRecyclerAdapter(this, items, new ToDoClickListener() {
+            @Override
+            public void onClick(View view, int position) {
+                openDescription(position);
+            }
+        }, new CheckBoxListener() {
+            @Override
+            public void onClick(View view, int position) {
+                delete(position,view);
+            }
+        });
+
+        LinearLayoutManager layoutManager;
+        layoutManager = new LinearLayoutManager(this);
+        listView.setLayoutManager(layoutManager);
         listView.setAdapter(adapter);
-        listView.setOnItemClickListener(this);
-        listView.setOnItemLongClickListener(this);
-//        sharedPreferences= getSharedPreferences("my_shared_pref",MODE_PRIVATE);
-//        pos=sharedPreferences.getInt("POS",-1);
-//        if(pos!=-1)
-//            setFromSharedPreference();
+     //   listView.addItemDecoration(new DividerItemDecoration(this,DividerItemDecoration.HORIZONTAL|DividerItemDecoration.VERTICAL));
+
+        ItemTouchHelper touchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP|ItemTouchHelper.DOWN,ItemTouchHelper.LEFT|ItemTouchHelper.RIGHT){
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder fromviewHolder, @NonNull RecyclerView.ViewHolder toviewHolder) {
+                int from = fromviewHolder.getAdapterPosition();
+                int to = toviewHolder.getAdapterPosition();
+
+                ToDo toDo = items.get(from);
+                items.remove(from);
+                items.add(to,toDo);
+                adapter.notifyItemMoved(from,to
+                );
+                return true;
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int i) {
+                items.remove(viewHolder.getAdapterPosition());
+                adapter.notifyItemRemoved(viewHolder.getAdapterPosition());
+            }
+        });
+
+        touchHelper.attachToRecyclerView(listView);
+
+        SnapHelper snapHelper = new LinearSnapHelper();
+        snapHelper.attachToRecyclerView(listView);
 
         ToDoOpenHelper openHelper = ToDoOpenHelper.getInstance(this);
         SQLiteDatabase database = openHelper.getReadableDatabase();
         Cursor cursor = database.query(Contract.ToDo.TODO_TABLE_NAME,null,null,null,null,null,Contract.ToDo.COLUMN_ID);
         while (cursor.moveToNext()){
-           // Toast.makeText(this,"inside while cursor",Toast.LENGTH_SHORT).show();
             String note = cursor.getString(cursor.getColumnIndex(Contract.ToDo.COLUMN_NOTE));
             String topic = cursor.getString(cursor.getColumnIndex(Contract.ToDo.COLUMN_TOPIC));
             long id = cursor.getLong(cursor.getColumnIndex(Contract.ToDo.COLUMN_ID));
             ToDo toDo = new ToDo(topic,note);
-            String time = cursor.getString(cursor.getColumnIndex(Contract.ToDo.COLUMN_TIME));
-            toDo.setTime(time);
+            long time = cursor.getLong(cursor.getColumnIndex(Contract.ToDo.COLUMN_TIME));
+            toDo.setTimeInMillis(time);
             toDo.setId(id);
             items.add(toDo);
             adapter.notifyDataSetChanged();
         }
     }
-
 
     public void newNote() {
         Intent intent = new Intent(this,AddNote.class);
@@ -82,7 +124,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        String topic,note,time;
+        String topic,note;
+        long time;
 
         if(requestCode==1){
             if(resultCode==2){
@@ -98,13 +141,21 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                        // Toast.makeText(this,"inside while cursor",Toast.LENGTH_SHORT).show();
                         note = cursor.getString(cursor.getColumnIndex(Contract.ToDo.COLUMN_NOTE));
                         topic = cursor.getString(cursor.getColumnIndex(Contract.ToDo.COLUMN_TOPIC));
-                        time = cursor.getString(cursor.getColumnIndex(Contract.ToDo.COLUMN_TIME));
+                        time = cursor.getLong(cursor.getColumnIndex(Contract.ToDo.COLUMN_TIME));
                         ToDo toDo = new ToDo(topic,note);
                         toDo.setId(id);
-                        toDo.setTime(time);
+                        toDo.setTimeInMillis(time);
                        // Toast.makeText(this,"icur "+topic,Toast.LENGTH_SHORT).show();
                         items.add(toDo);
                         adapter.notifyDataSetChanged();
+
+                        //setting alarm
+                        AlarmManager manager = (AlarmManager)getSystemService(ALARM_SERVICE);
+                        Intent intent = new Intent(this,MyReceiver.class);
+                        intent.putExtra("ID",id);
+                        PendingIntent pendingIntent = PendingIntent.getBroadcast(this,2,intent,0);
+
+                        manager.set(AlarmManager.RTC_WAKEUP,time,pendingIntent);
                     }
                 }
             }
@@ -121,20 +172,19 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                   //  Toast.makeText(this,"inside while cursor",Toast.LENGTH_SHORT).show();
                     note = cursor.getString(cursor.getColumnIndex(Contract.ToDo.COLUMN_NOTE));
                     topic = cursor.getString(cursor.getColumnIndex(Contract.ToDo.COLUMN_TOPIC));
-                    time = cursor.getString(cursor.getColumnIndex(Contract.ToDo.COLUMN_TIME));
+                    time = cursor.getLong(cursor.getColumnIndex(Contract.ToDo.COLUMN_TIME));
                     ToDo toDo = new ToDo(topic,note);
                     toDo.setId(id);
                  //   Toast.makeText(this,topic+" "+note,Toast.LENGTH_SHORT).show();
                     items.get(current).setTopic(topic);
                     items.get(current).setNote(note);
                     items.get(current).setId(id);
-                    items.get(current).setTime(time);
+                    items.get(current).setTimeInMillis(time);
                     adapter.notifyDataSetChanged();
                 }
                 openDescription(current);
             }
         }
-
     }
 
     @Override
@@ -160,10 +210,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-        openDescription(i);
-    }
 
     private void openDescription(int i) {
 
@@ -174,14 +220,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         startActivityForResult(intent,2);
     }
 
-    @Override
-    public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
-        delete(i);
-        return true;
-    }
-
-    private void delete(int i) {
-
+    private void delete(int i, final View view) {
         final int position= i;
         AlertDialog.Builder builder=new AlertDialog.Builder(this);
         builder.setTitle("Delete Note");
@@ -192,7 +231,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 long id= items.get(position).getId();
                 int k=items.get(position).getPosition();
                 items.remove(position);
-                adapter.notifyDataSetChanged();
+                adapter.notifyItemRemoved(position);
 
                 ToDoOpenHelper openHelper = ToDoOpenHelper.getInstance(MainActivity.this);
                 SQLiteDatabase database = openHelper.getWritableDatabase();
@@ -204,8 +243,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
+
+                CheckBox checkBox = (CheckBox)view;
+                checkBox.setChecked(false);
             }
         });
+
         AlertDialog dialog =builder.create();
         dialog.show();
     }

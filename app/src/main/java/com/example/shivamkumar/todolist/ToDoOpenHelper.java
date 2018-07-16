@@ -28,8 +28,7 @@ public class ToDoOpenHelper extends SQLiteOpenHelper {
         String todoSQL = "CREATE TABLE "+Contract.ToDo.TODO_TABLE_NAME+
                 " ( "+Contract.ToDo.COLUMN_ID+" INTEGER PRIMARY KEY AUTOINCREMENT , "+
                 Contract.ToDo.COLUMN_TOPIC+" TEXT , "+
-                Contract.ToDo.COLUMN_TIME+" TEXT , "+
-                Contract.ToDo.COLUMN_TIMESET+" TEXT , "+
+                Contract.ToDo.COLUMN_TIME+" LONG , "+
                 Contract.ToDo.COLUMN_NOTE+" TEXT )";
 
         sqLiteDatabase.execSQL(todoSQL);

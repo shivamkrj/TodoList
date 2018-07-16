@@ -43,7 +43,6 @@
         android:id="@+id/textView4"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="TextView"
         android:textSize="20sp"
         android:padding="15dp"
         android:layout_marginBottom="5dp"/>
@@ -52,13 +51,14 @@
         android:id="@+id/imageButton"
         android:layout_width="93dp"
         android:layout_height="wrap_content"
-        android:onClick="timer"
+        android:onClick="timeSet"
         app:srcCompat="@android:drawable/ic_lock_idle_alarm" />
+
     <ImageButton
         android:id="@+id/imageButton2"
         android:layout_width="93dp"
         android:layout_height="wrap_content"
-        android:onClick="timeSet"
+        android:onClick="timer"
         android:src="@drawable/calendar_icon"
         tools:ignore="OnClick" />
 

@@ -23,8 +23,11 @@ public class AddNote extends AppCompatActivity implements DatePickerDialog.OnDat
 
     EditText editTextTopic;
     EditText editTextNote;
-    String time;
-    boolean flag=true;
+    long time;
+    int h,m,y,mon,d;
+    boolean flag=false;
+    TextView t;
+    TextView textView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,6 +35,16 @@ public class AddNote extends AppCompatActivity implements DatePickerDialog.OnDat
 
         editTextNote = findViewById(R.id.editTextNote);
         editTextTopic = findViewById(R.id.editTextTopic);
+        t = findViewById(R.id.textView4);
+        textView =findViewById(R.id.timerText);
+        Calendar calendar = Calendar.getInstance();
+        h=calendar.get(Calendar.HOUR_OF_DAY);
+        m=calendar.get(Calendar.MINUTE);
+        d=calendar.get(Calendar.DAY_OF_MONTH);
+        mon=calendar.get(Calendar.MONTH);
+        y=calendar.get(Calendar.YEAR);
+        t.setText(h+":"+m);
+        textView.setText(d + "/"  + mon + "/" + y);
         Intent intent = getIntent();
         String num= intent.getStringExtra("num");
         String action = intent.getAction();
@@ -64,6 +77,9 @@ public class AddNote extends AppCompatActivity implements DatePickerDialog.OnDat
         Intent data = getIntent();
         String topic = editTextTopic.getText().toString();
         String note= editTextNote.getText().toString();
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(y,mon,d,h,m);
+        time=calendar.getTimeInMillis();
         if(topic!=null) {
 
             ToDoOpenHelper openHelper = ToDoOpenHelper.getInstance(this);
@@ -74,7 +90,7 @@ public class AddNote extends AppCompatActivity implements DatePickerDialog.OnDat
             contentValues.put(Contract.ToDo.COLUMN_TIME,time);
 
             long id = database.insert(Contract.ToDo.TODO_TABLE_NAME,null,contentValues);
-            Toast.makeText(this,id+" inside "+topic, Toast.LENGTH_SHORT).show();
+    //        Toast.makeText(this,id+" inside "+topic, Toast.LENGTH_SHORT).show();
             if(flag){
                 Intent intent = new Intent(this,MainActivity.class);
                 intent.putExtra("ID",id);
@@ -103,17 +119,22 @@ public class AddNote extends AppCompatActivity implements DatePickerDialog.OnDat
 
     @Override
     public void onDateSet(DatePicker datePicker, int i, int i1, int i2) {
+
+        y=i;
+        mon=i1;
+        d=i2;
         String s= i2+"/";
         s+=i1+"/";
         s+=i+"";
-        TextView textView =findViewById(R.id.timerText);
         textView.setText(s);
-        time = s;
     }
 
     @Override
     public void onTimeSet(TimePicker timePicker, int hour, int minute) {
         String s;
+        h=hour;
+        m=minute;
+
         if(DateFormat.is24HourFormat(this)){
             s = hour+":";
             s+=minute+"";
@@ -131,7 +152,7 @@ public class AddNote extends AppCompatActivity implements DatePickerDialog.OnDat
                 s+=minute+" pm";
             }
         }
-        TextView t = findViewById(R.id.textView4);
+
         t.setText(s);
     }
 }

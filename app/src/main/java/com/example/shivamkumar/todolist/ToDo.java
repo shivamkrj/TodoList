@@ -5,24 +5,16 @@ public class ToDo {
     private String note;
     private int position;
     private long id;
-    private String time;
-    private String timeSet;
+    private long timeInMillis;
 
-    public String getTimeSet() {
-        return timeSet;
+    public long getTimeInMillis() {
+        return timeInMillis;
     }
 
-    public void setTimeSet(String timeSet) {
-        this.timeSet = timeSet;
+    public void setTimeInMillis(long timeInMillis) {
+        this.timeInMillis = timeInMillis;
     }
 
-    public String getTime() {
-        return time;
-    }
-
-    public void setTime(String time) {
-        this.time = time;
-    }
 
     public long getId() {
         return id;
