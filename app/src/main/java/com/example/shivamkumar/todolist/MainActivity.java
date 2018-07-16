@@ -37,8 +37,23 @@ import java.util.Calendar;
 public class MainActivity extends AppCompatActivity {
 
     RecyclerView listView;
+    RecyclerView listViewToday;
+    RecyclerView listViewThisWeek;
+    RecyclerView listViewThisMonth;
+    RecyclerView listViewLater;
+    RecyclerView listViewOverdue;
     ArrayList<ToDo> items;
+    ArrayList<ToDo> itemsToday;
+    ArrayList<ToDo> itemsThisWeek;
+    ArrayList<ToDo> itemsThisMonth;
+    ArrayList<ToDo> itemsLater;
+    ArrayList<ToDo> itemsOverDue;
     ToDoRecyclerAdapter adapter;
+    ToDoRecyclerAdapter adapterOverDue;
+    ToDoRecyclerAdapter adapterToday;
+    ToDoRecyclerAdapter adapterThisWeek;
+    ToDoRecyclerAdapter adapterThisMonth;
+    ToDoRecyclerAdapter adapterLater;
     int current=0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,24 +69,43 @@ public class MainActivity extends AppCompatActivity {
                 newNote();
             }
         });
+
         items = new ArrayList<ToDo>();
+        itemsOverDue = new ArrayList<ToDo>();
+        itemsThisMonth = new ArrayList<ToDo>();
+        itemsThisWeek = new ArrayList<ToDo>();
+        itemsToday = new ArrayList<ToDo>();
+        itemsLater = new ArrayList<ToDo>();
         listView=findViewById(R.id.recyclerView);
-        adapter= new ToDoRecyclerAdapter(this, items, new ToDoClickListener() {
-            @Override
-            public void onClick(View view, int position) {
-                openDescription(position);
-            }
-        }, new CheckBoxListener() {
-            @Override
-            public void onClick(View view, int position) {
-                delete(position,view);
-            }
-        });
+        listViewToday=findViewById(R.id.recyclerViewToday);
+        listViewOverdue= findViewById(R.id.recyclerViewOverdue);
+        listViewThisWeek = findViewById(R.id.recyclerViewThisWeek);
+        listViewThisMonth = findViewById(R.id.recyclerViewThisMonth);
+        listViewLater = findViewById(R.id.recyclerViewLater);
+
+
+
+        assignAdapters();
 
         LinearLayoutManager layoutManager;
         layoutManager = new LinearLayoutManager(this);
         listView.setLayoutManager(layoutManager);
         listView.setAdapter(adapter);
+        listViewOverdue.setAdapter(adapter);
+        LinearLayoutManager layoutManager4 = new LinearLayoutManager(this);
+        listViewOverdue.setLayoutManager(layoutManager4);
+        listViewToday.setAdapter(adapter);
+        LinearLayoutManager layoutManager3 = new LinearLayoutManager(this);
+        listViewToday.setLayoutManager(layoutManager3);
+        listViewThisMonth.setAdapter(adapter);
+        LinearLayoutManager layoutManager2 = new LinearLayoutManager(this);
+        listViewThisMonth.setLayoutManager(layoutManager2);
+        listViewThisWeek.setAdapter(adapter);
+        LinearLayoutManager layoutManager1 = new LinearLayoutManager(this);
+        listViewThisWeek.setLayoutManager(layoutManager1);
+        listViewLater.setAdapter(adapter);
+        LinearLayoutManager layoutManager5 = new LinearLayoutManager(this);
+        listViewLater.setLayoutManager(layoutManager5);
      //   listView.addItemDecoration(new DividerItemDecoration(this,DividerItemDecoration.HORIZONTAL|DividerItemDecoration.VERTICAL));
 
         ItemTouchHelper touchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP|ItemTouchHelper.DOWN,ItemTouchHelper.LEFT|ItemTouchHelper.RIGHT){
@@ -100,9 +134,83 @@ public class MainActivity extends AppCompatActivity {
         SnapHelper snapHelper = new LinearSnapHelper();
         snapHelper.attachToRecyclerView(listView);
 
+        fetchData();
+    }
+
+    private void assignAdapters() {
+        adapter= new ToDoRecyclerAdapter(this, items, new ToDoClickListener() {
+            @Override
+            public void onClick(View view, int position) {
+                openDescription(position);
+            }
+        }, new CheckBoxListener() {
+            @Override
+            public void onClick(View view, int position) {
+                delete(position,view);
+            }
+        });
+        adapterOverDue= new ToDoRecyclerAdapter(this, itemsOverDue, new ToDoClickListener() {
+            @Override
+            public void onClick(View view, int position) {
+                openDescription(position);
+            }
+        }, new CheckBoxListener() {
+            @Override
+            public void onClick(View view, int position) {
+                delete(position,view);
+            }
+        });
+        adapterToday= new ToDoRecyclerAdapter(this, itemsToday, new ToDoClickListener() {
+            @Override
+            public void onClick(View view, int position) {
+                openDescription(position);
+            }
+        }, new CheckBoxListener() {
+            @Override
+            public void onClick(View view, int position) {
+                delete(position,view);
+            }
+        });
+        adapterThisMonth= new ToDoRecyclerAdapter(this, itemsThisMonth, new ToDoClickListener() {
+            @Override
+            public void onClick(View view, int position) {
+                openDescription(position);
+            }
+        }, new CheckBoxListener() {
+            @Override
+            public void onClick(View view, int position) {
+                delete(position,view);
+            }
+        });
+        adapterThisWeek= new ToDoRecyclerAdapter(this, itemsThisWeek, new ToDoClickListener() {
+            @Override
+            public void onClick(View view, int position) {
+                openDescription(position);
+            }
+        }, new CheckBoxListener() {
+            @Override
+            public void onClick(View view, int position) {
+                delete(position,view);
+            }
+        });
+        adapterLater= new ToDoRecyclerAdapter(this, itemsLater, new ToDoClickListener() {
+            @Override
+            public void onClick(View view, int position) {
+                openDescription(position);
+            }
+        }, new CheckBoxListener() {
+            @Override
+            public void onClick(View view, int position) {
+                delete(position,view);
+            }
+        });
+
+    }
+
+    private void fetchData() {
         ToDoOpenHelper openHelper = ToDoOpenHelper.getInstance(this);
         SQLiteDatabase database = openHelper.getReadableDatabase();
-        Cursor cursor = database.query(Contract.ToDo.TODO_TABLE_NAME,null,null,null,null,null,Contract.ToDo.COLUMN_ID);
+        Cursor cursor = database.query(Contract.ToDo.TODO_TABLE_NAME,null,null,null,null,null,Contract.ToDo.COLUMN_TIME);
         while (cursor.moveToNext()){
             String note = cursor.getString(cursor.getColumnIndex(Contract.ToDo.COLUMN_NOTE));
             String topic = cursor.getString(cursor.getColumnIndex(Contract.ToDo.COLUMN_TOPIC));
@@ -111,8 +219,36 @@ public class MainActivity extends AppCompatActivity {
             long time = cursor.getLong(cursor.getColumnIndex(Contract.ToDo.COLUMN_TIME));
             toDo.setTimeInMillis(time);
             toDo.setId(id);
-            items.add(toDo);
-            adapter.notifyDataSetChanged();
+
+            long curTime = System.currentTimeMillis();
+            long differenceInTime = time-curTime;
+            if(differenceInTime<=0){
+                itemsOverDue.add(toDo);
+                adapterOverDue.notifyDataSetChanged();
+            }else{
+                Calendar calendar= Calendar.getInstance();
+                calendar.setTimeInMillis(differenceInTime);
+                int y = calendar.get(Calendar.YEAR);
+                int m = calendar.get(Calendar.MONTH);
+                int h= calendar.get(Calendar.HOUR_OF_DAY);
+                int min = calendar.get(Calendar.MINUTE);
+                int day = calendar.get(Calendar.DAY_OF_MONTH);
+              //  String t[] = tm.split(" ");\
+                Log.d("timemachine",y+" "+m+" "+h+" "+min);
+                if(y>0||m>0){
+                    itemsLater.add(toDo);
+                    adapterLater.notifyDataSetChanged();
+                }else if(day>6){
+                    itemsThisMonth.add(toDo);
+                    adapterThisMonth.notifyDataSetChanged();
+                }else if(day>0){
+                    itemsThisWeek.add(toDo);
+                    adapterThisWeek.notifyDataSetChanged();
+                }else {
+                    itemsToday.add(toDo);
+                    adapterToday.notifyDataSetChanged();
+                }
+            }
         }
     }
 

@@ -6,4 +6,10 @@
     <string name="title_activity_edit_description">EditDescription</string>
     <string name="save_changes">Save Changes</string>
     <string name="name">Name</string>
+    <string name="no_date">No date</string>
+    <string name="later">Later</string>
+    <string name="this_month">This Month</string>
+    <string name="this_week">This Week</string>
+    <string name="today">Today</string>
+    <string name="overdue">Overdue</string>
 </resources>
