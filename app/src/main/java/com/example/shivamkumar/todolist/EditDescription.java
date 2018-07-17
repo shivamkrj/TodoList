@@ -29,6 +29,8 @@ public class EditDescription extends AppCompatActivity implements DatePickerDial
     TextView timerSet;
     String topic;
     String note;
+    boolean dateFlag;
+    boolean timeFlag;
     long time;
     long id;
     int h,m,d,mon,y;
@@ -55,17 +57,42 @@ public class EditDescription extends AppCompatActivity implements DatePickerDial
         n=findViewById(R.id.editText2);
         timer=findViewById(R.id.editText3);
         timerSet=findViewById(R.id.editText4);
+
         t.setText(topic);
         n.setText(note);
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(time);
-        h=calendar.get(Calendar.HOUR_OF_DAY);
-        m=calendar.get(Calendar.MINUTE);
-        d=calendar.get(Calendar.DAY_OF_MONTH);
-        mon=calendar.get(Calendar.MONTH);
-        y=calendar.get(Calendar.YEAR);
-        timerSet.setText(h+":"+m);
-        timer.setText(d + "/"  + mon + "/" + y);
+
+        if(time==0){
+            timerSet.setText("");
+            timer.setText("");
+        }else{
+            Calendar calendar2 =Calendar.getInstance();
+            calendar2.setTimeInMillis(time);
+            int hour = calendar2.get(Calendar.HOUR_OF_DAY);
+            int minute = calendar2.get(Calendar.MINUTE);
+            int second = calendar2.get(Calendar.SECOND);
+            d=calendar2.get(Calendar.DAY_OF_MONTH);
+            mon=calendar2.get(Calendar.MONTH);
+            y=calendar2.get(Calendar.YEAR);
+            if(hour==23&&minute==59&&second==59)
+            {
+                timerSet.setText("");
+                timer.setText(d + "/"  + mon + "/" + y);
+            }
+
+            else {
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTimeInMillis(time);
+                h=calendar.get(Calendar.HOUR_OF_DAY);
+                m=calendar.get(Calendar.MINUTE);
+                d=calendar.get(Calendar.DAY_OF_MONTH);
+                mon=calendar.get(Calendar.MONTH);
+                y=calendar.get(Calendar.YEAR);
+                timerSet.setText(h+":"+m);
+                timer.setText(d + "/"  + mon + "/" + y);
+            }
+        }
+
+
     }
 
     public void button(View view) {
@@ -75,8 +102,20 @@ public class EditDescription extends AppCompatActivity implements DatePickerDial
         Intent data = getIntent();
 
         Calendar calendar = Calendar.getInstance();
-        calendar.set(y,mon,d,h,m);
-        time=calendar.getTimeInMillis();
+//        calendar.set(y,mon,d,h,m);
+//        time=calendar.getTimeInMillis();
+
+        if(dateFlag){
+            if(timeFlag){
+                calendar.set(y,mon,d,h,m);
+                time=calendar.getTimeInMillis();
+            }else {
+                calendar.set(y,mon,d,23,59,59);
+                time = calendar.getTimeInMillis();
+            }
+        }else {
+            time = 0;
+        }
 
         if(topic!=null) {
 
@@ -122,6 +161,7 @@ public class EditDescription extends AppCompatActivity implements DatePickerDial
         s+=i1+"/";
         s+=i+"";
         timer.setText(s);
+        dateFlag=true;
     }
 
     @Override
@@ -129,7 +169,7 @@ public class EditDescription extends AppCompatActivity implements DatePickerDial
         String s;
         h=hour;
         m=minute;
-
+        timeFlag=true;
         if(DateFormat.is24HourFormat(this)){
             s = hour+":";
             s+=minute+"";

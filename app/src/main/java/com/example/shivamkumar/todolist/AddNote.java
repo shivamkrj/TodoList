@@ -88,7 +88,7 @@ public class AddNote extends AppCompatActivity implements DatePickerDialog.OnDat
                 calendar.set(y,mon,d,h,m);
                 time=calendar.getTimeInMillis();
             }else {
-                calendar.set(y,m,d,23,59,59);
+                calendar.set(y,mon,d,23,59,59);
                 time = calendar.getTimeInMillis();
             }
         }else {

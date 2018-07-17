@@ -48,7 +48,7 @@ public class ToDoRecyclerAdapter extends RecyclerView.Adapter<ToDoViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull final ToDoViewHolder viewHolder, int i) {
         ToDo toDo = list.get(i);
-        if(toDo.getType()<6&&toDo.getType()>0)
+        if(toDo.getType()<7&&toDo.getType()>0)
         {
             viewHolder.checkBox.setVisibility(View.GONE);
             viewHolder.textViewTopic.setTextSize(16);
@@ -73,6 +73,8 @@ public class ToDoRecyclerAdapter extends RecyclerView.Adapter<ToDoViewHolder> {
                 viewHolder.textViewTopic.setText(R.string.this_week);
             }else if(toDo.getType()==5){
                 viewHolder.textViewTopic.setText(R.string.today);
+            }else if(toDo.getType()==6){
+                viewHolder.textViewTopic.setText(R.string.noDate);
             }
             return;
         }

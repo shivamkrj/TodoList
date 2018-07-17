@@ -112,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void fetchData(long idd) {
-        int flag = 10;
+        int flag = 11;
         items.clear();
         ToDoOpenHelper openHelper = ToDoOpenHelper.getInstance(this);
         SQLiteDatabase database = openHelper.getReadableDatabase();
@@ -126,11 +126,22 @@ public class MainActivity extends AppCompatActivity {
             toDo.setTimeInMillis(time);
             if(time==0){
                 toDo.setType(20);
+                if(flag==11){
+                    flag=10;
+                    ToDo toDo1 = new ToDo(6);
+                    items.add(toDo1);
+                    adapter.notifyDataSetChanged();
+                }
+                items.add(toDo);
+                adapter.notifyDataSetChanged();
             }
             toDo.setId(id);
             long curTime = System.currentTimeMillis();
             long differenceInTime = time-curTime;
-            if(differenceInTime<=0){
+            if(time==0){
+
+            }
+            else if(differenceInTime<=0){
                 if(flag==10){
                     flag = 6;
                     ToDo toDo1 = new ToDo(1);
@@ -238,7 +249,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 fetchData(id);
-                openDescription(current);
+              //  openDescription(current);
             }
         }
     }

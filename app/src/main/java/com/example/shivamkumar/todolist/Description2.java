@@ -18,7 +18,7 @@ public class Description2 extends Activity {
     TextView n;
     TextView timer;
     TextView timerSet;
-    Long time;
+    Long time=0L;
     String topic;
     String note;
     long id ;
@@ -40,6 +40,8 @@ public class Description2 extends Activity {
 
         Intent data= getIntent();
         id = data.getLongExtra("ID",-1);
+        if(id==-1)
+            return;
         ToDoOpenHelper openHelper = ToDoOpenHelper.getInstance(this);
         SQLiteDatabase database = openHelper.getReadableDatabase();
         String[] arg = {id+""};
@@ -53,6 +55,22 @@ public class Description2 extends Activity {
         n=findViewById(R.id.textView2);
         timer=findViewById(R.id.textView3);
         timerSet=findViewById(R.id.textViewTims);
+
+        if(time==0){
+            timerSet.setVisibility(View.GONE);
+            timer.setVisibility(View.GONE);
+        }else{
+            Calendar calendar =Calendar.getInstance();
+            calendar.setTimeInMillis(time);
+            int hour = calendar.get(Calendar.HOUR_OF_DAY);
+            int minute = calendar.get(Calendar.MINUTE);
+            int second = calendar.get(Calendar.SECOND);
+            if(hour==23&&minute==59&&second==59)
+                timerSet.setVisibility(View.GONE);
+        }
+        if(note==null||note.length()==0){
+            n.setVisibility(View.GONE);
+        }
 
         t.setText(topic);
         n.setText(note);

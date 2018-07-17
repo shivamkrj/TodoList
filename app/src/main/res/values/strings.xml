@@ -14,4 +14,5 @@
     <string name="overdue">Overdue</string>
     <string name="enter_task_here">Enter Task Here</string>
     <string name="enter_description">Enter Description</string>
+    <string name="noDate">No Date</string>
 </resources>
