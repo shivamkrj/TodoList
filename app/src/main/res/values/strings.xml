@@ -12,4 +12,6 @@
     <string name="this_week">This Week</string>
     <string name="today">Today</string>
     <string name="overdue">Overdue</string>
+    <string name="enter_task_here">Enter Task Here</string>
+    <string name="enter_description">Enter Description</string>
 </resources>

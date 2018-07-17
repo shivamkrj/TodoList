@@ -13,6 +13,7 @@ import android.text.format.DateFormat;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -28,6 +29,8 @@ public class AddNote extends AppCompatActivity implements DatePickerDialog.OnDat
     boolean flag=false;
     TextView t;
     TextView textView;
+    boolean dateFlag;
+    boolean timeFlag;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,14 +40,16 @@ public class AddNote extends AppCompatActivity implements DatePickerDialog.OnDat
         editTextTopic = findViewById(R.id.editTextTopic);
         t = findViewById(R.id.textView4);
         textView =findViewById(R.id.timerText);
+        dateFlag = false;
+        timeFlag = false;
         Calendar calendar = Calendar.getInstance();
         h=calendar.get(Calendar.HOUR_OF_DAY);
         m=calendar.get(Calendar.MINUTE);
         d=calendar.get(Calendar.DAY_OF_MONTH);
         mon=calendar.get(Calendar.MONTH);
         y=calendar.get(Calendar.YEAR);
-        t.setText(h+":"+m);
-        textView.setText(d + "/"  + mon + "/" + y);
+//        t.setText(h+":"+m);
+//        textView.setText(d + "/"  + mon + "/" + y);
         Intent intent = getIntent();
         String num= intent.getStringExtra("num");
         String action = intent.getAction();
@@ -78,8 +83,17 @@ public class AddNote extends AppCompatActivity implements DatePickerDialog.OnDat
         String topic = editTextTopic.getText().toString();
         String note= editTextNote.getText().toString();
         Calendar calendar = Calendar.getInstance();
-        calendar.set(y,mon,d,h,m);
-        time=calendar.getTimeInMillis();
+        if(dateFlag){
+            if(timeFlag){
+                calendar.set(y,mon,d,h,m);
+                time=calendar.getTimeInMillis();
+            }else {
+                calendar.set(y,m,d,23,59,59);
+                time = calendar.getTimeInMillis();
+            }
+        }else {
+            time = 0;
+        }
         if(topic!=null) {
 
             ToDoOpenHelper openHelper = ToDoOpenHelper.getInstance(this);
@@ -127,6 +141,10 @@ public class AddNote extends AppCompatActivity implements DatePickerDialog.OnDat
         s+=i1+"/";
         s+=i+"";
         textView.setText(s);
+        t.setVisibility(View.VISIBLE);
+        ImageView image = findViewById(R.id.imageButton);
+        image.setVisibility(View.VISIBLE);
+        dateFlag=true;
     }
 
     @Override
@@ -134,6 +152,7 @@ public class AddNote extends AppCompatActivity implements DatePickerDialog.OnDat
         String s;
         h=hour;
         m=minute;
+        timeFlag=true;
 
         if(DateFormat.is24HourFormat(this)){
             s = hour+":";

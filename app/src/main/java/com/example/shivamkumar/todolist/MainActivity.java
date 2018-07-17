@@ -65,23 +65,27 @@ public class MainActivity extends AppCompatActivity {
         }, new CheckBoxListener() {
             @Override
             public void onClick(View view, int position) {
-                delete(position,view);
+                deleteFromButton(position,view);
             }
         });
 
         LinearLayoutManager layoutManager;
-        layoutManager = new LinearLayoutManager(this);
+        layoutManager = new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false);
         listView.setLayoutManager(layoutManager);
         listView.setAdapter(adapter);
      //   listView.addItemDecoration(new DividerItemDecoration(this,DividerItemDecoration.HORIZONTAL|DividerItemDecoration.VERTICAL));
 
-        ItemTouchHelper touchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP|ItemTouchHelper.DOWN,ItemTouchHelper.LEFT|ItemTouchHelper.RIGHT){
+        ItemTouchHelper touchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0,ItemTouchHelper.LEFT|ItemTouchHelper.RIGHT){
             @Override
             public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder fromviewHolder, @NonNull RecyclerView.ViewHolder toviewHolder) {
+
                 int from = fromviewHolder.getAdapterPosition();
                 int to = toviewHolder.getAdapterPosition();
 
                 ToDo toDo = items.get(from);
+                if(toDo.getType()>0&&toDo.getType()<7){
+                    return false;
+                }
                 items.remove(from);
                 items.add(to,toDo);
                 adapter.notifyItemMoved(from,to);
@@ -92,14 +96,17 @@ public class MainActivity extends AppCompatActivity {
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int i) {
 //                items.remove(viewHolder.getAdapterPosition());
 //                adapter.notifyItemRemoved(viewHolder.getAdapterPosition());
-                delete(viewHolder.getAdapterPosition(),viewHolder.itemView);
+                ToDo toDo = items.get(viewHolder.getAdapterPosition());
+                if(toDo.getType()>0&&toDo.getType()<7){
+                    fetchData(0);
+                    return;
+                }
+                delete(viewHolder.getAdapterPosition(), viewHolder.itemView);
             }
         });
-
         touchHelper.attachToRecyclerView(listView);
-
-        SnapHelper snapHelper = new LinearSnapHelper();
-        snapHelper.attachToRecyclerView(listView);
+//        SnapHelper snapHelper = new LinearSnapHelper();
+//        snapHelper.attachToRecyclerView(listView);
 
         fetchData(0);
     }
@@ -117,8 +124,10 @@ public class MainActivity extends AppCompatActivity {
             ToDo toDo = new ToDo(topic,note);
             long time = cursor.getLong(cursor.getColumnIndex(Contract.ToDo.COLUMN_TIME));
             toDo.setTimeInMillis(time);
+            if(time==0){
+                toDo.setType(20);
+            }
             toDo.setId(id);
-
             long curTime = System.currentTimeMillis();
             long differenceInTime = time-curTime;
             if(differenceInTime<=0){
@@ -178,11 +187,11 @@ public class MainActivity extends AppCompatActivity {
             cursor = database.query(Contract.ToDo.TODO_TABLE_NAME,null,Contract.ToDo.COLUMN_ID+" = ?",arg,null,null,null);
             while (cursor.moveToNext()){
                 long time2 = cursor.getLong(cursor.getColumnIndex(Contract.ToDo.COLUMN_TIME));
-
+                int iddd = (int)idd;
                 AlarmManager manager = (AlarmManager)getSystemService(ALARM_SERVICE);
                 Intent intent = new Intent(this,MyReceiver.class);
                 intent.putExtra("ID",idd);
-                PendingIntent pendingIntent = PendingIntent.getBroadcast(this,2,intent,0);
+                PendingIntent pendingIntent = PendingIntent.getBroadcast(this,iddd,intent,PendingIntent.FLAG_UPDATE_CURRENT);
 
                 manager.set(AlarmManager.RTC_WAKEUP,time2,pendingIntent);
             }
@@ -205,53 +214,30 @@ public class MainActivity extends AppCompatActivity {
                 long id = data.getLongExtra("ID",-1);
                 if(id>=0){
                     fetchData(id);
-//                    ToDoOpenHelper openHelper = ToDoOpenHelper.getInstance(this);
-//                    SQLiteDatabase database = openHelper.getReadableDatabase();
-//                    String arg[]= {id+""};
-//                    Cursor cursor = database.query(Contract.ToDo.TODO_TABLE_NAME,null,Contract.ToDo.COLUMN_ID+" = ?",arg,null,null,null);
-//                    while (cursor.moveToNext()){
-//                       // Toast.makeText(this,"inside while cursor",Toast.LENGTH_SHORT).show();
-//                        note = cursor.getString(cursor.getColumnIndex(Contract.ToDo.COLUMN_NOTE));
-//                        topic = cursor.getString(cursor.getColumnIndex(Contract.ToDo.COLUMN_TOPIC));
-//                        time = cursor.getLong(cursor.getColumnIndex(Contract.ToDo.COLUMN_TIME));
-//                        ToDo toDo = new ToDo(topic,note);
-//                        toDo.setId(id);
-//                        toDo.setTimeInMillis(time);
-//                        items.add(toDo);
-//                        adapter.notifyDataSetChanged();
-//
-//                        //setting alarm
-//                        AlarmManager manager = (AlarmManager)getSystemService(ALARM_SERVICE);
-//                        Intent intent = new Intent(this,MyReceiver.class);
-//                        intent.putExtra("ID",id);
-//                        PendingIntent pendingIntent = PendingIntent.getBroadcast(this,2,intent,0);
-//
-//                        manager.set(AlarmManager.RTC_WAKEUP,time,pendingIntent);
-//                    }
                 }
             }
         }else if(requestCode==2){
             if(resultCode==4){
                 long id = data.getLongExtra("ID",-1);
 
-                //code to cancel alarm
+                //updating alarm
+                String arg[]= {id+""};
+                ToDoOpenHelper openHelper = ToDoOpenHelper.getInstance(this);
+                SQLiteDatabase database = openHelper.getReadableDatabase();
+                Cursor cursor = database.query(Contract.ToDo.TODO_TABLE_NAME,null,Contract.ToDo.COLUMN_ID+" = ?",arg,null,null,null);
+                while (cursor.moveToNext()){
+                    long time2 = cursor.getLong(cursor.getColumnIndex(Contract.ToDo.COLUMN_TIME));
+                    int t = (int)time2/1000;
+                    AlarmManager manager = (AlarmManager)getSystemService(ALARM_SERVICE);
+                    Intent intent = new Intent(this,MyReceiver.class);
+                    intent.putExtra("ID",id);
+                    int idd =(int)id;
+                    PendingIntent pendingIntent = PendingIntent.getBroadcast(this,idd,intent,PendingIntent.FLAG_UPDATE_CURRENT);
+
+                    manager.set(AlarmManager.RTC_WAKEUP,time2,pendingIntent);
+                }
+
                 fetchData(id);
-//                ToDoOpenHelper openHelper = ToDoOpenHelper.getInstance(this);
-//                SQLiteDatabase database = openHelper.getReadableDatabase();
-//                String arg[]= {id +""};
-//                Cursor cursor = database.query(Contract.ToDo.TODO_TABLE_NAME,null,Contract.ToDo.COLUMN_ID+" = ?",arg,null,null,null);
-//                while (cursor.moveToNext()){
-//                    note = cursor.getString(cursor.getColumnIndex(Contract.ToDo.COLUMN_NOTE));
-//                    topic = cursor.getString(cursor.getColumnIndex(Contract.ToDo.COLUMN_TOPIC));
-//                    time = cursor.getLong(cursor.getColumnIndex(Contract.ToDo.COLUMN_TIME));
-//                    ToDo toDo = new ToDo(topic,note);
-//                    toDo.setId(id);
-//                    items.get(current).setTopic(topic);
-//                    items.get(current).setNote(note);
-//                    items.get(current).setId(id);
-//                    items.get(current).setTimeInMillis(time);
-//                    adapter.notifyDataSetChanged();
-//                }
                 openDescription(current);
             }
         }
@@ -274,12 +260,29 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void openDescription(int i) {
-
         long id = items.get(i).getId();
         current = i;
         Intent intent = new Intent(this,Description2.class);
         intent.putExtra("ID",id);
         startActivityForResult(intent,2);
+    }
+
+    public void deleteFromButton(int position,View view){
+        Toast.makeText(MainActivity.this,"Task Completed",Toast.LENGTH_SHORT).show();
+        long id= items.get(position).getId();
+        int k=items.get(position).getPosition();
+        items.remove(position);
+        adapter.notifyItemRemoved(position);
+
+        ToDoOpenHelper openHelper = ToDoOpenHelper.getInstance(MainActivity.this);
+        SQLiteDatabase database = openHelper.getWritableDatabase();
+        String arg[]={id+""};
+        database.delete(Contract.ToDo.TODO_TABLE_NAME,Contract.ToDo.COLUMN_ID+ " = ?",arg);
+
+        items.clear();
+        adapter.notifyDataSetChanged();
+        fetchData(0);
+
     }
 
     private void delete(int i, final View view) {
@@ -299,15 +302,16 @@ public class MainActivity extends AppCompatActivity {
                 SQLiteDatabase database = openHelper.getWritableDatabase();
                 String arg[]={id+""};
                 database.delete(Contract.ToDo.TODO_TABLE_NAME,Contract.ToDo.COLUMN_ID+ " = ?",arg);
-
+                items.clear();
+                adapter.notifyDataSetChanged();
+                Toast.makeText(MainActivity.this,"Task Completed",Toast.LENGTH_SHORT).show();
+                fetchData(0);
             }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-
-                CheckBox checkBox = (CheckBox)view;
-                checkBox.setChecked(false);
+                fetchData(0);
             }
         });
         AlertDialog dialog =builder.create();

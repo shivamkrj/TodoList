@@ -48,7 +48,7 @@ public class MyReceiver extends BroadcastReceiver {
                         manager.createNotificationChannel(channel);
                     }
 
-                    NotificationCompat.Builder builder = new NotificationCompat.Builder(context,"mychannleid");
+                    NotificationCompat.Builder builder = new NotificationCompat.Builder(context,"mychannelid");
                     builder.setContentTitle("Create ToDo for:"+senderNum);
                     builder.setContentText(message);
                     builder.setSmallIcon(R.drawable.time_icon);
