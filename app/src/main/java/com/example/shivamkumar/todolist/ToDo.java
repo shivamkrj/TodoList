@@ -1,10 +1,25 @@
 package com.example.shivamkumar.todolist;
 
 public class ToDo {
+    private int type;
     private String topic;
     private String note;
     private int position;
     private long id;
+
+    public ToDo(int type) {
+        this.type = type;
+    }
+
+    public int getType() {
+
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
+
     private long timeInMillis;
 
     public long getTimeInMillis() {

@@ -1,107 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<ScrollView
+    <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    android:layout_height="wrap_content"
-    android:layout_width="match_parent">
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-
-        tools:context=".MainActivity"
-        tools:showIn="@layout/activity_main"
-        android:orientation="vertical"
-        android:padding="7dp"
-        android:layout_marginTop="200dp"
-        android:layout_marginBottom="400dp">
-
-        <TextView
-
-            android:id="@+id/titleTextOverdue"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            android:textColor="#d50f08"
-            android:textSize="16sp"
-            android:text="@string/overdue"/>
-
-        <android.support.v7.widget.RecyclerView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/recyclerViewOverdue"/>
-        <TextView
-            android:id="@+id/titleTextToday"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            android:textColor="#080fd5"
-            android:textSize="16sp"
-            android:text="@string/today"/>
-
-        <android.support.v7.widget.RecyclerView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/recyclerViewToday"/>
-        <TextView
-            android:id="@+id/titleTextThisWeek"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            android:textColor="#080fd5"
-            android:textSize="16sp"
-            android:text="@string/this_week"/>
-
-        <android.support.v7.widget.RecyclerView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/recyclerViewThisWeek"/>
-        <TextView
-            android:id="@+id/titleTextThisMonth"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            android:textColor="#080fd5"
-            android:textSize="16sp"
-            android:text="@string/this_month"/>
-
-        <android.support.v7.widget.RecyclerView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/recyclerViewThisMonth"/>
-        <TextView
-            android:id="@+id/titleTextLater"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            android:textColor="#080fd5"
-            android:textSize="16sp"
-            android:text="@string/later"/>
-
-        <android.support.v7.widget.RecyclerView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/recyclerViewLater"/>
-        <TextView
-            android:id="@+id/titleTextNoDate"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            android:textColor="#05500a"
-            android:textSize="16sp"
-            android:text="@string/no_date"/>
+    tools:context=".MainActivity"
+    tools:showIn="@layout/activity_main"
+    android:orientation="vertical"
+    android:padding="7dp">
 
         <android.support.v7.widget.RecyclerView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/recyclerView"/>
 
-
     </LinearLayout>
-
-</ScrollView>
-
