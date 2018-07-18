@@ -13,6 +13,8 @@ import android.app.Activity;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.text.format.DateFormat;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -77,6 +79,7 @@ public class EditDescription extends AppCompatActivity implements DatePickerDial
             {
                 timerSet.setText("");
                 timer.setText(d + "/"  + mon + "/" + y);
+                dateFlag=true;
             }
 
             else {
@@ -89,10 +92,73 @@ public class EditDescription extends AppCompatActivity implements DatePickerDial
                 y=calendar.get(Calendar.YEAR);
                 timerSet.setText(h+":"+m);
                 timer.setText(d + "/"  + mon + "/" + y);
+                dateFlag=true;
+                timeFlag=true;
             }
         }
 
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.edit_menu,menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int iddd = item.getItemId();
+        if (iddd == R.id.action_save) {
+            topic=t.getText().toString();
+            note=n.getText().toString();
+
+            Intent data = getIntent();
+
+            Calendar calendar = Calendar.getInstance();
+//        calendar.set(y,mon,d,h,m);
+//        time=calendar.getTimeInMillis();
+
+            if(dateFlag){
+                if(timeFlag){
+                    calendar.set(y,mon,d,h,m);
+                    time=calendar.getTimeInMillis();
+                }else {
+                    calendar.set(y,mon,d,23,59,59);
+                    time = calendar.getTimeInMillis();
+                }
+            }else {
+                time = 0;
+            }
+
+            if(topic!=null) {
+
+                ToDoOpenHelper openHelper = ToDoOpenHelper.getInstance(this);
+                SQLiteDatabase database = openHelper.getWritableDatabase();
+                ContentValues contentValues = new ContentValues();
+                contentValues.put(Contract.ToDo.COLUMN_TOPIC,topic);
+                contentValues.put(Contract.ToDo.COLUMN_NOTE,note);
+                contentValues.put(Contract.ToDo.COLUMN_TIME,time);
+
+
+
+                long preId=id;
+                String arg[]={id+""};
+                long id = database.update(Contract.ToDo.TODO_TABLE_NAME,contentValues,Contract.ToDo.COLUMN_ID+" = ?",arg);
+                if(id>-1L){
+                    data.putExtra("ID",preId);
+                    setResult(3,data);
+                    finish();
+                }
+                else {
+                    data.putExtra("ID", id);
+                    setResult(2, data);
+                    finish();
+                }
+            }
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     public void button(View view) {

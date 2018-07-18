@@ -81,6 +81,10 @@ public class AddNote extends AppCompatActivity implements DatePickerDialog.OnDat
     public void button(View view) {
         Intent data = getIntent();
         String topic = editTextTopic.getText().toString();
+        if(topic==null||topic.length()==0){
+            Toast.makeText(this,"Enter Task",Toast.LENGTH_SHORT).show();
+            return;
+        }
         String note= editTextNote.getText().toString();
         Calendar calendar = Calendar.getInstance();
         if(dateFlag){

@@ -40,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
     ToDoRecyclerAdapter adapter;
     ArrayList<ToDo> items;
     int current=0;
+    public static int textSize = 12;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -263,7 +264,17 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.action_settings) {
+        if (id == R.id.sizetwelve) {
+            textSize=12;
+            fetchData(0);
+            return true;
+        }else if (id == R.id.sizefourteen) {
+            textSize=15;
+            fetchData(0);
+            return true;
+        }else if (id == R.id.sizenine) {
+            textSize=9;
+            fetchData(0);
             return true;
         }
 

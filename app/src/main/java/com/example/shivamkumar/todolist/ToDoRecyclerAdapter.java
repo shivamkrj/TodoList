@@ -89,7 +89,7 @@ public class ToDoRecyclerAdapter extends RecyclerView.Adapter<ToDoViewHolder> {
         viewHolder.textViewTopic.setTextColor(Color.parseColor("#090808"));
         CardView cardView = (CardView) viewHolder.itemView;
         cardView.setCardBackgroundColor(Color.parseColor("#d5ddc6"));
-        viewHolder.textViewTopic.setTextSize(spToPx(12,context));
+        viewHolder.textViewTopic.setTextSize(spToPx(MainActivity.textSize,context));
 
         viewHolder.textViewTopic.setText(toDo.getTopic());
         Calendar calendar = Calendar.getInstance();
